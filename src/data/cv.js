@@ -33,7 +33,7 @@ export const profile = {
     // the destination inbox is configured entirely on the form provider's
     // side, so it's never visible in this public repo, the page source,
     // or dev tools. See README "Contact form" for full setup steps.
-    formEndpoint: '',
+    formEndpoint: 'https://formspree.io/f/myeyjvop',
   },
 };
 
