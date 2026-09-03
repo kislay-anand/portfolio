@@ -38,11 +38,11 @@ let errored = false;
 try {
   const { renderAll } = await import(path.resolve('src/components/render.js'));
   const { initReveal } = await import(path.resolve('src/components/reveal.js'));
-  const { initCopyButtons } = await import(path.resolve('src/components/clipboard.js'));
+  const { initContactForm } = await import(path.resolve('src/components/contactForm.js'));
 
   renderAll();
   initReveal();
-  initCopyButtons();
+  initContactForm(window.document);
   window.document.getElementById('year').textContent = String(new Date().getFullYear());
 } catch (err) {
   errored = true;
@@ -57,7 +57,8 @@ const checks = [
   ['At least one certification card', window.document.querySelectorAll('#certifications .card3d').length >= 1],
   ['Certificates list rendered', window.document.querySelectorAll('#certificates .list-card').length === 6],
   ['Education list rendered', window.document.querySelectorAll('#education .list-card').length === 3],
-  ['Contact section has copy buttons', window.document.querySelectorAll('.copy-btn').length === 2],
+  ['Contact form present with name/email/message fields', !!window.document.querySelector('#contact-form input[name="name"]') && !!window.document.querySelector('#contact-form input[name="email"]') && !!window.document.querySelector('#contact-form textarea[name="message"]')],
+  ['No raw email/phone displayed in contact section', !/helltohacking|your\.email@example\.com/.test(window.document.getElementById('contact').textContent)],
   ['Footer year populated', /\d{4}/.test(window.document.getElementById('year').textContent)],
   ['Nav has 8 links (no Publications, since list is empty)', window.document.querySelectorAll('#navMenu a').length === 8],
 ];

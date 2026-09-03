@@ -228,43 +228,44 @@ function renderPublicationsNavIfNeeded() {
 /* ---------------------------- CONTACT ---------------------------- */
 function renderContact() {
   const section = document.getElementById('contact');
-  const emailIsPlaceholder = profile.contactPlaceholder;
 
   section.appendChild(el(`
     <div class="reveal">
       <span class="section__eyebrow">Get in Touch</span>
       <h2 class="section__heading" id="contact-heading">Contact</h2>
       <p class="section__intro">
-        ${emailIsPlaceholder
-          ? 'Email and phone are placeholders — the CV this site was generated from left them blank. Update <code>src/data/cv.js</code> with real values.'
-          : "Reach out any of the ways below — copy buttons put the value straight on your clipboard."}
+        Send a message directly — it goes straight to my inbox. Prefer to connect elsewhere? GitHub and LinkedIn are one click away.
       </p>
-      <div class="contact-grid">
-        <div class="contact-item">
-          <div>
-            <span class="contact-item__label">Email</span>
-            <span class="contact-item__value ${emailIsPlaceholder ? 'contact-item__value--placeholder' : ''}">${profile.email}</span>
+
+      <div class="contact-layout">
+        <form id="contact-form" class="contact-form" novalidate>
+          <div class="contact-form__row">
+            <label for="contact-name">Name</label>
+            <input id="contact-name" name="name" type="text" autocomplete="name" required />
           </div>
-          <button class="copy-btn" data-copy="${profile.email}">Copy</button>
-        </div>
-        <div class="contact-item">
-          <div>
-            <span class="contact-item__label">Phone</span>
-            <span class="contact-item__value ${emailIsPlaceholder ? 'contact-item__value--placeholder' : ''}">${profile.phone}</span>
+          <div class="contact-form__row">
+            <label for="contact-email">Your email</label>
+            <input id="contact-email" name="email" type="email" autocomplete="email" required />
           </div>
-          <button class="copy-btn" data-copy="${profile.phone}">Copy</button>
-        </div>
-        <div class="contact-item">
-          <div>
+          <div class="contact-form__row">
+            <label for="contact-message">Message</label>
+            <textarea id="contact-message" name="message" rows="5" required></textarea>
+          </div>
+          <div class="contact-form__actions">
+            <button class="btn btn--primary" type="submit">Send message</button>
+            <span class="contact-form__status" role="status" aria-live="polite"></span>
+          </div>
+        </form>
+
+        <div class="contact-links">
+          <a class="contact-link" href="${profile.links.github}" target="_blank" rel="noopener noreferrer">
             <span class="contact-item__label">GitHub</span>
-            <span class="contact-item__value"><a href="${profile.links.github}" target="_blank" rel="noopener noreferrer">${profile.links.github.replace('https://', '')}</a></span>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div>
+            <span class="contact-item__value">${profile.links.github.replace('https://', '')}</span>
+          </a>
+          <a class="contact-link" href="${profile.links.linkedin}" target="_blank" rel="noopener noreferrer">
             <span class="contact-item__label">LinkedIn</span>
-            <span class="contact-item__value"><a href="${profile.links.linkedin}" target="_blank" rel="noopener noreferrer">View profile</a></span>
-          </div>
+            <span class="contact-item__value">View profile</span>
+          </a>
         </div>
       </div>
     </div>

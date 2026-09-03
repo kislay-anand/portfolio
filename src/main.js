@@ -1,6 +1,6 @@
 import { renderAll } from './components/render.js';
 import { initReveal } from './components/reveal.js';
-import { initCopyButtons } from './components/clipboard.js';
+import { initContactForm } from './components/contactForm.js';
 import { initConsentBanner } from './components/analytics.js';
 
 function initNav() {
@@ -46,7 +46,7 @@ function init() {
   initNav();
   initFooterYear();
   initReveal();
-  initCopyButtons();
+  initContactForm();
   initHero3D();
 
   // Show the analytics opt-in after the visitor has had a moment to look around.

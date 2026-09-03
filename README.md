@@ -58,20 +58,23 @@ Examples:
 
 After editing, just run `npm run build` (or push to `main` — the GitHub Action rebuilds for you).
 
-### Contact info placeholder — action needed
-Your source CV had `E-mail:` and `Mobile:` labels with **no values filled in**. Per your instructions, the site currently shows clearly-marked placeholder values (`your.email@example.com`, `+91 00000 00000`) in the Contact section, with an inline note telling visitors these are placeholders. **Before going live**, open `src/data/cv.js` and update:
+### Contact form — action needed to actually receive emails
+The Contact section is a message form (name / email / message) — no raw email or phone number is shown on the page anywhere. As shipped, it works with **zero setup** via a `mailto:` fallback: submitting opens the visitor's own email app, addressed to `helltohacking@gmail.com` with the message pre-filled. That's reliable but requires the visitor to hit "send" themselves in their mail app.
 
-```js
-export const profile = {
-  ...
-  email: 'your.email@example.com',   // ← replace with your real email
-  phone: '+91 00000 00000',          // ← replace with your real number
-  contactPlaceholder: true,          // ← set to false once both are real
-  ...
-};
-```
+**To have messages land in your inbox automatically (no visitor action needed), wire up a free form backend — recommended: [Formspree](https://formspree.io):**
 
-Setting `contactPlaceholder` to `false` removes the placeholder styling and the "these are placeholders" note automatically.
+1. Sign up at formspree.io (free tier is enough) and verify `helltohacking@gmail.com` as the receiving address.
+2. Create a new form; Formspree gives you an endpoint like `https://formspree.io/f/abcdwxyz`.
+3. Paste it into `src/data/cv.js`:
+   ```js
+   contact: {
+     destinationEmail: 'helltohacking@gmail.com',
+     formEndpoint: 'https://formspree.io/f/abcdwxyz', // ← paste your real endpoint here
+   },
+   ```
+4. Rebuild/redeploy. The form will now `POST` directly to Formspree, which emails you the submission — the mailto fallback only kicks back in if that request ever fails (e.g., Formspree is down), so the form always works either way.
+
+Any Formspree-compatible service (Getform, Web3Forms, etc.) works the same way — just drop its endpoint into `formEndpoint`.
 
 ### Swapping the résumé PDF
 Replace `public/Kislay_Anand_Resume.pdf` with an updated export of your CV (keep the same filename, or update `profile.resumeFile` in `src/data/cv.js` to match a new filename).
@@ -96,7 +99,7 @@ The Experience card's "View Certificate" button reads from `experience[i].certif
   - Text/background color pairs were checked against WCAG contrast math; body text ≥ 8:1, accent text used for copy ≥ 5.6:1, primary button text 4.66:1 (all pass AA; see `scripts/` if you want to re-verify after a palette change).
 - **SEO & social previews:** meta description, canonical URL, Open Graph + Twitter Card tags, a generated `og-image.png`, `Person` JSON-LD structured data, `robots.txt`, and `sitemap.xml`. Update the placeholder URLs (`https://kislay-anand.github.io/`) in `index.html`, `public/robots.txt`, and `public/sitemap.xml` if you deploy under a different domain or repo name.
 - **Analytics:** opt-in only. A consent banner appears after a short delay; no tracking script is ever requested until the visitor clicks "Accept." Wire your real analytics provider into `loadAnalyticsScript()` in `src/components/analytics.js` (a commented Plausible example is included). As shipped, consent is **not** persisted across sessions (no localStorage/cookies are set) — see the comment in that file if you want to persist the choice.
-- **Copy-to-clipboard:** contact email/phone use the Clipboard API with a `document.execCommand` fallback for older browsers.
+- **Contact form:** a name/email/message form with no raw email or phone displayed on the page. It posts to a configurable form backend (Formspree-compatible) and falls back to a `mailto:` link if no backend is configured or the request fails — see §3 for setup.
 - **Asset optimization:** production build is minified, code-split (Three.js in its own cacheable chunk), and pre-compressed with both Brotli and gzip (`vite-plugin-compression2`) so a CDN/host that supports `Accept-Encoding` negotiation can serve the smaller files directly.
 
 ---
@@ -104,10 +107,10 @@ The Experience card's "View Certificate" button reads from `experience[i].certif
 ## 5. Quality assurance
 
 ### Automated
-`npm test` runs `scripts/smoke-test.mjs`, which loads the real `index.html` and the actual source modules (`render.js`, `reveal.js`, `clipboard.js`) into a headless DOM (jsdom) and asserts:
+`npm test` runs `scripts/smoke-test.mjs`, which loads the real `index.html` and the actual source modules (`render.js`, `reveal.js`, `contactForm.js`) into a headless DOM (jsdom) and asserts:
 - The name, resume download link, and GitHub link render.
 - Every CV-driven section (projects, certifications, certificates, education) renders the expected number of entries.
-- Contact copy buttons and the footer year are present.
+- Contact form fields and its submit button are present.
 - No uncaught runtime errors occur during render/init.
 
 This catches data-shape regressions (e.g., a malformed entry in `cv.js`) and rendering crashes before you deploy. It does **not** test WebGL rendering, visual layout, or animations — see the manual checklist below for that.
@@ -116,11 +119,11 @@ This catches data-shape regressions (e.g., a malformed entry in `cv.js`) and ren
 - [ ] **Cross-browser:** check latest Chrome, Firefox, Safari, and Edge. Safari in particular is worth checking for `backdrop-filter` and 3D transform quirks.
 - [ ] **Mobile:** verify the nav hamburger menu, card flip via tap, and that the hero falls back gracefully to the gradient background (no WebGL) on a real phone.
 - [ ] **Reduced motion:** enable "Reduce Motion" in OS accessibility settings and confirm animations are skipped/instant.
-- [ ] **Keyboard-only pass:** Tab through the whole page — nav, cards (flip with Enter/Space), modal open/close/focus-trap, copy buttons.
+- [ ] **Keyboard-only pass:** Tab through the whole page — nav, cards (flip with Enter/Space), modal open/close/focus-trap, and the contact form.
 - [ ] **Screen reader spot-check:** VoiceOver/NVDA pass over the hero, a flipped card, and an open modal.
 - [ ] **Lighthouse:** run a Performance + Accessibility + SEO audit on the deployed URL; the architecture here (code-split Three.js, compressed assets, semantic HTML) is designed to score well, but real device/network conditions vary.
 - [ ] **Update the placeholder URLs** noted in §4 (SEO section) to match your actual deployed domain.
-- [ ] **Fill in real contact details** per §3 before sharing the link publicly.
+- [ ] **Configure the contact form backend** (Formspree endpoint) per §3 so messages land in your inbox automatically, rather than relying on the mailto fallback.
 
 ### Known non-issue
 `npm audit` may flag a moderate/high advisory in `esbuild`/older `vite` versions. That advisory only affects the **local dev server** (`vite dev`) being reachable by other sites on your machine during development — it does not affect the static production build this site ships, and does not apply once deployed. Avoid running `npm run dev` on an untrusted network with the dev server exposed publicly, and keep dependencies updated (`npm outdated`) periodically.
@@ -140,7 +143,7 @@ This catches data-shape regressions (e.g., a malformed entry in `cv.js`) and ren
 │   │   ├── render.js              # Builds every section's DOM from cv.js
 │   │   ├── modal.js                # Accessible project-detail dialog
 │   │   ├── reveal.js               # Scroll-triggered fade-in (IntersectionObserver)
-│   │   ├── clipboard.js            # Copy-to-clipboard for contact info
+│   │   ├── contactForm.js          # Contact form: Formspree POST with mailto fallback
 │   │   └── analytics.js            # Opt-in consent banner + analytics loader stub
 │   ├── three/heroScene.js         # Procedural 3D chessboard + knight, lazy-loaded
 │   └── styles/main.css            # Design tokens, layout, card-flip, responsive rules

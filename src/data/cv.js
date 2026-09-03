@@ -18,11 +18,19 @@ export const profile = {
     github: 'https://github.com/kislay-anand',
     linkedin: 'https://www.linkedin.com/in/kislay-anand-rt/',
   },
-  // TODO: CV left these blank — add your real contact details here.
-  email: 'your.email@example.com',
-  phone: '+91 00000 00000',
-  contactPlaceholder: true, // set to false once email/phone above are real
   resumeFile: './Kislay_Anand_Resume.pdf',
+  contact: {
+    // Where messages from the site's contact form arrive. Not displayed
+    // anywhere on the page — only used as the mailto fallback target and,
+    // once configured, as the account behind formEndpoint below.
+    destinationEmail: 'helltohacking@gmail.com',
+    // TODO: create a free form at https://formspree.io (verify it with the
+    // destinationEmail above) and paste its endpoint here, e.g.
+    // 'https://formspree.io/f/abcdwxyz'. Until this is set, the form falls
+    // back to opening the visitor's own email client via a mailto: link —
+    // see README §3 "Contact form" for full setup steps.
+    formEndpoint: '',
+  },
 };
 
 export const summary =
