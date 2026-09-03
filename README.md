@@ -1,6 +1,6 @@
 # Kislay Anand — Cybersecurity Portfolio
 
-A chess-deck-themed portfolio site generated from `CV.docx`. It's a **plain static site — no build step, no bundler, no npm install required to host it.** Push these files to a GitHub repo, flip on GitHub Pages, and it's live.
+A chess-deck-themed portfolio site generated from your CV. It's a **plain static site — no build step, no bundler, no npm install required to host it.** Push these files to a GitHub repo, flip on GitHub Pages, and it's live.
 
 Sections: Hero · Summary · Skills · Experience · Projects · Labs & Training · Certifications · Certificates · Education · Contact.
 
@@ -19,37 +19,46 @@ You do **not** need Node.js, npm, or a build step to host this. It's just HTML/C
      git push -u origin main
      ```
 3. **Turn on Pages:** in the repo, go to **Settings → Pages**. Under "Build and deployment → Source", pick **either**:
-   - **"Deploy from a branch"** → branch `main`, folder `/ (root)` → Save. *(Simplest option — GitHub just serves the files directly, checks for updates every time you push. Recommended if you're not using the included Action.)*
-   - **"GitHub Actions"** → the included `.github/workflows/deploy.yml` will run automatically and publish the site (it also runs a rebuild on every future push). Pick this if you want the deploy step to explicitly skip files like `README.md` from the published site.
+   - **"Deploy from a branch"** → branch `main`, folder `/ (root)` → Save. *(Simplest option.)*
+   - **"GitHub Actions"** → the included `.github/workflows/deploy.yml` runs automatically and keeps repo-only files like `README.md` out of the published site.
 4. Wait 1–2 minutes. Your site is live at `https://<your-username>.github.io/<repo-name>/` (or `https://<your-username>.github.io/` if the repo is your `.github.io` repo).
 
-That's it — there's no `npm run build`, no `dist` folder, nothing to compile. What you push is what gets served.
-
-### Why no build step is needed
-The browser loads `src/main.js` directly as a native ES module (`<script type="module">`), and every file it imports is plain, unbundled JavaScript. The one external dependency, Three.js, is loaded from a CDN via a browser **import map** declared right in `index.html` — so there's nothing to `npm install` for the site to run.
+No `npm run build`, no `dist` folder — what you push is what gets served, because the browser loads every JS file as a native ES module and Three.js comes from a CDN via a browser import map declared in `index.html`.
 
 ### Why it works at any URL/sub-path
-Every path in `index.html` and the JS (`./src/...`, `./favicon.svg`, etc.) is written as a **relative** path, so the site works identically whether it's served from your domain root or from a `/repo-name/` sub-path. Nothing needs to change if you rename the repo.
+Every path in `index.html` and the JS is written as a **relative** path, so the site works identically at your domain root or at a `/repo-name/` sub-path — nothing to change if you rename the repo.
 
 ---
 
 ## 2. Local preview (optional)
 
-You don't need this to host the site, but it's useful for checking changes before you push:
-
 ```bash
 npm run dev
 ```
 
-This just runs a static file server (`npx serve .`) — no build, no transformation, exactly the files GitHub Pages will serve. Alternatively, open `index.html` directly in a browser, or use any static server / VS Code's "Live Server" extension.
+Runs a plain static file server (`npx serve .`) — the exact files GitHub Pages will serve, no build. You can also just open `index.html` directly in a browser.
 
 ---
 
-## 3. Contact form — how messages reach your inbox (and why no email address is anywhere in this repo)
+## 3. Add your photo
 
-The Contact section is a plain message box (name / email / message) — **no email address or phone number appears anywhere on the page, in the page source, or in this repo's code.** That's deliberate: on a static site, anything written into the HTML/JS is public and visible to anyone who views source or opens dev tools, so your address is never placed there.
+The Contact section has a photo placeholder next to the message form, above the GitHub/LinkedIn links. To swap it for a real photo:
 
-To receive the messages, the form posts to a small third-party form backend — the destination inbox is configured **only inside that service's own dashboard**, never in this codebase:
+1. Drop a square photo (400×400px or larger works best) into the repo root — e.g. `photo.jpg`.
+2. In `src/data/cv.js`, update:
+   ```js
+   photo: './photo.jpg',   // ← was './profile-placeholder.svg'
+   ```
+
+Until you do this, `profile-placeholder.svg` (a plain silhouette) is shown so the layout is complete and nothing looks broken.
+
+---
+
+## 4. Contact form — how messages reach your inbox (and why no email address is anywhere in this repo)
+
+The Contact section is a plain message box (name / email / message) — **no email address or phone number appears anywhere on the page, in the page source, or in this repo's code.** Anything written into a static site's HTML/JS is public to anyone who views source, so your address is never placed there.
+
+To receive messages, the form posts to a small third-party form backend — the destination inbox is configured **only inside that service's own dashboard**, never in this codebase:
 
 1. Go to **[formspree.io](https://formspree.io)** (free tier is enough) and sign up.
 2. Create a new form and verify it with the email you want messages to arrive at. Formspree gives you an endpoint URL like `https://formspree.io/f/abcdwxyz`.
@@ -59,86 +68,81 @@ To receive the messages, the form posts to a small third-party form backend — 
      formEndpoint: 'https://formspree.io/f/abcdwxyz', // ← your real endpoint
    },
    ```
-4. Push the change. The form now posts straight to Formspree, which emails you the submission — your address itself lives only in Formspree's dashboard.
 
-Any Formspree-compatible service (Getform, Web3Forms, etc.) works identically — just drop its endpoint into `formEndpoint`.
-
-**Until you do this, the form is fully functional in the UI but shows a polite "not connected yet" message on submit** rather than silently failing or falling back to anything that would expose an address (there's no mailto fallback — that would put your email in the page).
+Any Formspree-compatible service (Getform, Web3Forms, etc.) works identically. **Until this is set, the form shows a polite "not connected yet" message on submit** — there's no fallback that would expose an address.
 
 ---
 
-## 4. Updating your content
+## 5. Updating your content
 
 **All CV content lives in one file: `src/data/cv.js`.** Edit the arrays/objects there — no HTML/CSS/JS structure changes needed:
-- **New certification** → add to `certifications`.
+- **New certification/certificate** → add to `certifications` or `certificates` (each can include a `certificateUrl` — it renders as a "View Certificate" link on the back of the flip card).
 - **New project** → add to `projects` (`title`, `period`, `summary`, `points`, `tags`).
 - **New job/internship** → add to `experience`.
-- **Publications** → add to `publications`; the nav link and section appear automatically once it's non-empty (hidden while empty, matching your current CV).
+- **Publications** → add to `publications`; the nav link and section appear automatically once it's non-empty.
 
 ### Swapping the résumé PDF
-Replace `Kislay_Anand_Resume.pdf` at the repo root with an updated export (keep the filename, or update `profile.resumeFile` in `cv.js` if you rename it).
-
-### Updating the CEH/certificate proof link
-The Experience card's "View Certificate" button reads `experience[i].certificateUrl` — edit that field per entry.
+Replace `Kislay_Anand_Resume.pdf` at the repo root (keep the filename, or update `profile.resumeFile` in `cv.js` if you rename it).
 
 ---
 
-## 5. Design & technical notes
+## 6. Design & technical notes
 
-- **Visual theme:** black/red "chess deck" motif — card grid with chess-square corner accents, a chess pawn (♙) as the list-bullet glyph, and a rotating low-poly 3D chessboard + knight in the hero (built procedurally in Three.js — no external 3D model files to license or maintain).
-- **3D & animation performance:**
-  - The Three.js hero scene is deferred via `requestIdleCallback` and loaded as a separate module, so it never blocks first paint.
-  - It's skipped entirely (falling back to a CSS radial-gradient) on small screens (`< 760px`) or low-core-count devices, and the render loop pauses when the tab is hidden.
-  - Card flips use CSS 3D transforms (`preserve-3d`, `rotateY`) — GPU-accelerated and much cheaper than WebGL per card.
+- **Visual theme:** black/red "chess deck" motif — card grid with chess-square corner accents, a chess king (♔) as the list-bullet glyph, and two low-poly 3D king pieces (built procedurally in Three.js — no external model files) facing each other across a rotating chessboard in the hero: **red** faces the viewer when the page opens, **black** stands opposite it.
+- **Cards:** flip-to-view is the *only* detail interaction — click/tap or press Enter/Space to flip a card and see its full detail list on the back (no separate "more detail" popup). Experience, Projects, Labs, Certifications, and Certificates all use the same card treatment, including a "View Certificate" link wherever a proof link exists.
+- **Animation, throughout the page, not just the hero:**
+  - The 3D chessboard sits as a fixed, transparent backdrop **behind the entire page** (not just the hero) — it's visible faintly as you scroll all the way down, and its rotation is tied to scroll progress across the *whole document*, not just the first screen.
+  - Every card, list row, and skill group fades/slides in on scroll with a staggered delay (via `IntersectionObserver`), so sections cascade in as you reach them rather than only the section headings animating.
+  - Card flips use CSS 3D transforms (`preserve-3d`, `rotateY`) — GPU-accelerated.
   - Every animation respects `prefers-reduced-motion: reduce`.
-- **Accessibility (WCAG AA target):**
-  - Skip-to-content link, semantic landmarks, visible focus rings (`:focus-visible`).
-  - Cards are keyboard-operable (`Enter`/`Space` to flip, `aria-pressed` state).
-  - Project/experience modals are accessible dialogs (`role="dialog"`, focus trap, `Escape` to close, focus returns to trigger on close).
-  - Text/background pairs were checked against WCAG contrast math; body text ≥ 8:1, accent text ≥ 5.6:1, primary button text 4.66:1.
-- **SEO & social previews:** meta description, canonical URL, Open Graph + Twitter Card tags, a generated `og-image.png`, `Person` JSON-LD, `robots.txt`, `sitemap.xml`. Update the placeholder URL (`https://kislay-anand.github.io/`) in `index.html`, `robots.txt`, and `sitemap.xml` if your final URL differs.
-- **Analytics:** opt-in only — a consent banner appears after a short delay; no tracking script is requested until the visitor clicks "Accept." Wire a real provider into `loadAnalyticsScript()` in `src/components/analytics.js` (a commented Plausible example is included). Consent is not persisted across sessions by default (no cookies/localStorage are set).
+- **3D performance:** the Three.js scene is deferred via `requestIdleCallback` (so it never blocks first paint), skipped entirely on small screens (`< 760px`) or low-core-count devices in favor of a CSS gradient fallback, and its render loop pauses when the tab is hidden.
+- **Accessibility (WCAG AA target):** skip-to-content link, semantic landmarks, visible focus rings, keyboard-operable cards (`Enter`/`Space` to flip, `aria-pressed` state), and contrast-checked text/background pairs (body text ≥ 8:1, accent text ≥ 5.6:1, primary button text 4.66:1).
+- **SEO & social previews:** meta description, canonical URL, Open Graph + Twitter Card tags, `og-image.png`, `Person` JSON-LD, `robots.txt`, `sitemap.xml`. Update the placeholder URL (`https://kislay-anand.github.io/`) in `index.html`, `robots.txt`, and `sitemap.xml` if your final URL differs.
+- **Analytics:** opt-in only — no tracking script loads until the visitor clicks "Accept" on the consent banner. Wire a real provider into `loadAnalyticsScript()` in `src/components/analytics.js`.
 
 ---
 
-## 6. Quality assurance
+## 7. Quality assurance
 
 ### Automated
-`npm test` runs `scripts/smoke-test.mjs` (requires `npm install` first, dev-only — not needed for hosting). It loads the real `index.html` and the actual source modules into a headless DOM and asserts:
-- The name, resume download link, and GitHub link render.
-- Every CV-driven section renders the expected number of entries.
-- The contact form's fields are present, and **no email or phone string appears anywhere in the rendered contact section** — this is checked automatically so a future edit can't accidentally reintroduce one.
+```bash
+npm install   # dev-only, not needed for hosting — installs jsdom for the test
+npm test
+```
+`scripts/smoke-test.mjs` loads the real `index.html` and the actual source modules into a headless DOM and asserts:
+- The name, corrected hero role text (CEH, no "Full-Stack Dev"), résumé link, and GitHub link render.
+- Every CV-driven section renders the expected number of entries, including the corrected education percentages (63.6% / 74.6%) and the "B.Tech. Hons." degree label.
+- Certificates render as flip cards (not a plain list), and no "more detail" button exists anywhere.
+- The contact form and photo placeholder are present, and **no email/phone string appears anywhere in the contact section** — checked automatically so a future edit can't reintroduce one.
 - No uncaught runtime errors occur during render/init.
 
 ### Manual checklist before publishing
-- [ ] **Cross-browser:** check latest Chrome, Firefox, Safari, and Edge.
+- [ ] **Cross-browser:** latest Chrome, Firefox, Safari, Edge.
 - [ ] **Mobile:** nav hamburger menu, tap-to-flip cards, hero gradient fallback (no WebGL) on a real phone.
 - [ ] **Reduced motion:** enable "Reduce Motion" in OS accessibility settings and confirm animations skip/are instant.
-- [ ] **Keyboard-only pass:** Tab through nav, cards (flip with Enter/Space), modal open/close/focus-trap, and the contact form.
-- [ ] **Screen reader spot-check:** VoiceOver/NVDA over the hero, a flipped card, and an open modal.
-- [ ] **Lighthouse:** run Performance + Accessibility + SEO on the deployed URL.
-- [ ] **Configure the Formspree endpoint** (§3) so messages actually reach you.
-- [ ] **Update placeholder URLs** (§5, SEO) to match your real deployed domain.
+- [ ] **Keyboard-only pass:** Tab through nav, cards (flip with Enter/Space), and the contact form.
+- [ ] **Add your real photo** (§3) and **configure the Formspree endpoint** (§4).
+- [ ] **Update placeholder URLs** (§6, SEO) to match your real deployed domain.
 
 ---
 
-## 7. Project structure
+## 8. Project structure
 
 ```
 .
 ├── index.html                     # Document shell, SEO/meta tags, import map, section anchors
-├── Kislay_Anand_Resume.pdf        # Downloadable résumé (linked from the hero)
+├── Kislay_Anand_Resume.pdf        # Downloadable résumé
+├── profile-placeholder.svg        # Photo placeholder — swap per §3
 ├── favicon.svg, og-image.png, robots.txt, sitemap.xml
 ├── .github/workflows/deploy.yml   # Optional: Actions-based Pages deploy (see §1)
 ├── src/
 │   ├── data/cv.js                 # ← single source of truth for all content
 │   ├── components/
 │   │   ├── render.js              # Builds every section's DOM from cv.js
-│   │   ├── modal.js                # Accessible project-detail dialog
-│   │   ├── reveal.js               # Scroll-triggered fade-in (IntersectionObserver)
+│   │   ├── reveal.js               # Staggered scroll-triggered fade-in (IntersectionObserver)
 │   │   ├── contactForm.js          # Contact form → Formspree-compatible POST (no client-side email)
 │   │   └── analytics.js            # Opt-in consent banner + analytics loader stub
-│   ├── three/heroScene.js         # Procedural 3D chessboard + knight, lazy-loaded, uses the "three" import map
+│   ├── three/heroScene.js         # Two facing 3D king pieces (red/black) + chessboard, full-page scroll-linked
 │   └── styles/main.css            # Design tokens, layout, card-flip, responsive rules
 ├── scripts/smoke-test.mjs         # Dev-only automated smoke test (npm test)
 └── package.json                   # Dev-only scripts (local preview + test) — not required to host
@@ -146,6 +150,6 @@ The Experience card's "View Certificate" button reads `experience[i].certificate
 
 ---
 
-## 8. License
+## 9. License
 
-No license file is included by default — add one (e.g. MIT) if you want to make the source reusable by others. The résumé PDF, name, and CV content remain personal to Kislay Anand regardless of the code license.
+No license file is included by default — add one (e.g. MIT) if you want to make the source reusable by others. The résumé PDF, name, photo, and CV content remain personal to Kislay Anand regardless of the code license.

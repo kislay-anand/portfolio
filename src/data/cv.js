@@ -3,22 +3,26 @@
 //
 // Everything the site displays is read from this file. To update the
 // portfolio after a new certification, project, or job, edit the relevant
-// array below and rebuild (`npm run build`) — no HTML/JS edits needed.
+// array below and refresh the page — no HTML/JS edits needed (this is a
+// zero-build static site).
 //
 // Placeholders you should fill in are marked  // TODO
 // ---------------------------------------------------------------------------
 
 export const profile = {
   name: 'Kislay Anand',
-  role: 'Cybersecurity Enthusiast · VAPT · OSINT · Full-Stack Dev',
+  role: 'Cybersecurity Enthusiast · VAPT · OSINT · CEH',
   tagline:
-    'B.Tech CSE student focused on offensive security, web application testing, and building secure systems from the ground up.',
+    'B.Tech (Hons.) CSE student focused on offensive security, web application testing, and building secure systems from the ground up.',
   location: 'Punjab, India',
   links: {
     github: 'https://github.com/kislay-anand',
     linkedin: 'https://www.linkedin.com/in/kislay-anand-rt/',
   },
   resumeFile: './Kislay_Anand_Resume.pdf',
+  // TODO: replace with a real photo (square, at least 400x400px works best).
+  // Drop the file in at the repo root and update this path — e.g. './photo.jpg'.
+  photo: './profile-placeholder.svg',
   contact: {
     // TODO: create a free form at https://formspree.io (or any compatible
     // service — Getform, Web3Forms, etc.), point it at your inbox from
@@ -35,7 +39,7 @@ export const profile = {
 
 export const summary =
   'Computer Science undergraduate with hands-on experience across VAPT, OSINT, web application security, and cryptography. ' +
-  'Comfortable working the full stack — from Arduino/hardware builds to Active Directory lab administration to no-code web products — ' +
+  'Comfortable working across the stack — from Arduino/hardware builds to Active Directory lab administration to no-code web products — ' +
   'and applies the same rigor to writing secure code as to breaking insecure code.';
 
 export const skills = [
@@ -67,12 +71,12 @@ export const skills = [
 
 export const experience = [
   {
-    title: 'Young Innovator Internship Challenge',
+    title: 'Young Innovator Internship Challenge — Scalar School of Technology',
     period: "Apr '24 – Jun '24",
     type: 'Internship',
     points: ['Designed and developed a no-code website.'],
     certificateUrl:
-      'https://drive.google.com/file/d/1o56jShT1h4MKBtBbBy_InsYpQx016-kQ/view?usp=sharing',
+      'https://drive.google.com/file/d/1LZVGQjamL4qzzoy8WiMkeEA4PZ2A0FsG/view?usp=drive_link',
   },
 ];
 
@@ -110,6 +114,8 @@ export const labs = [
       'Practiced OSINT techniques as part of a supervised training exercise',
       'Gained hands-on experience with web exploitation',
     ],
+    certificateUrl:
+      'https://drive.google.com/file/d/1_P5Q9_Dbqrbq6DaQRNFTU9fDP8T9XJoj/view?usp=drive_link',
   },
 ];
 
@@ -122,38 +128,70 @@ export const certifications = [
       'Worked hands-on with Wireshark, Nmap, and Burp Suite',
       'Practiced multiple attack types and planning methodologies in lab environments',
     ],
+    certificateUrl:
+      'https://drive.google.com/file/d/1qb3sgHkPhw7EGURjoTPIvVVU-LngsA3M/view?usp=drive_link',
   },
 ];
 
 export const certificates = [
-  { title: 'Programming Fundamentals using Python – Part 1', issuer: 'Infosys Springboard', period: "Jul '26" },
-  { title: 'Programming Fundamentals using Python – Part 2', issuer: 'Infosys Springboard', period: "Jul '26" },
-  { title: 'Advent of Cyber 2025', issuer: 'TryHackMe', period: "Dec '25" },
-  { title: 'Computer Programming', issuer: 'iamneo', period: "May '26" },
-  { title: 'Indian Laws: Know Your Rights', issuer: 'Learn Foundation Online', period: "May '25" },
-  { title: 'Drop Certified Security Course', issuer: 'Drop Organization', period: "Jul '24" },
+  {
+    title: 'Programming Fundamentals using Python – Part 1',
+    issuer: 'Infosys Springboard',
+    period: "Jul '26",
+    certificateUrl: 'https://drive.google.com/file/d/1vfYwb7pzweJjmjudsyf6gtOdY-biC-BK/view?usp=drive_link',
+  },
+  {
+    title: 'Programming Fundamentals using Python – Part 2',
+    issuer: 'Infosys Springboard',
+    period: "Jul '26",
+    certificateUrl: 'https://drive.google.com/file/d/1HmMObj7p28CdlHSBm2XFkXlqVUy-WrMA/view?usp=drive_link',
+  },
+  {
+    title: 'Advent of Cyber 2025',
+    issuer: 'TryHackMe',
+    period: "Dec '25",
+    certificateUrl: 'https://drive.google.com/file/d/1WGycWTaQP84i2Z8utl0vxB0FqEmbgrHV/view?usp=drive_link',
+  },
+  {
+    title: 'Computer Programming',
+    issuer: 'iamneo',
+    period: "May '26",
+    certificateUrl: 'https://drive.google.com/file/d/1QEoHj-6xGkrggS5gQrVwv9wFmisZMbOV/view?usp=sharing',
+  },
+  {
+    title: 'Indian Laws: Know Your Rights',
+    issuer: 'Learn Foundation Online',
+    period: "May '25",
+    certificateUrl: 'https://drive.google.com/file/d/1pmBJH0fqbVJQzbMd4tbYUar4CEp0tJCv/view?usp=drive_link',
+  },
+  {
+    title: 'Drop Certified Security Course',
+    issuer: 'Drop Organization',
+    period: "Jul '24",
+    certificateUrl: 'https://drive.google.com/file/d/1QERkHsf8uO8t3ISNi4c0PDduV6qTlZNL/view?usp=drive_link',
+  },
 ];
 
 export const education = [
   {
     school: 'Lovely Professional University',
     location: 'Punjab, India',
-    degree: 'B.Tech — Computer Science and Engineering',
+    degree: 'B.Tech. Hons. — Computer Science and Engineering',
     metric: 'CGPA: 8.53',
     period: "Aug '25 – Present",
   },
   {
-    school: '+2 High School Sabour',
+    school: '+2 High School Sabour Bhagalpur',
     location: 'Bihar, India',
     degree: 'Intermediate',
-    metric: 'Percentage: 64.6%',
+    metric: 'Percentage: 63.6%',
     period: "Apr '23 – Mar '25",
   },
   {
-    school: '+2 High School Sabour',
+    school: 'High School Sabour Bhagalpur',
     location: 'Bihar, India',
     degree: 'Matriculation',
-    metric: 'Percentage: 84.4%',
+    metric: 'Percentage: 74.6%',
     period: "Apr '22 – Mar '23",
   },
 ];

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 const RED = 0xe0263a;
+const BLACK = 0x141414;
 const DARK_SQUARE = 0x101010;
 const LIGHT_SQUARE = 0x1d1d1d;
 
@@ -30,33 +31,38 @@ function buildBoard() {
   return group;
 }
 
-/** A simple low-poly knight silhouette built from primitives (no external assets). */
-function buildKnight() {
+/**
+ * A low-poly king piece built from primitives (no external model files):
+ * a wide base, a tapered body, a crown band, and a cross on top.
+ */
+function buildKing(color) {
   const group = new THREE.Group();
   const material = new THREE.MeshStandardMaterial({
-    color: RED,
+    color,
     roughness: 0.35,
-    metalness: 0.4,
-    emissive: RED,
-    emissiveIntensity: 0.08,
+    metalness: 0.45,
+    emissive: color,
+    emissiveIntensity: 0.06,
   });
 
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.5, 0.25, 24), material);
-  base.position.y = 0.18;
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.54, 0.2, 24), material);
+  base.position.y = 0.1;
 
-  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.32, 0.7, 16), material);
-  stem.position.y = 0.65;
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.4, 0.95, 20), material);
+  body.position.y = 0.72;
 
-  const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.55, 0.32), material);
-  head.position.set(0.02, 1.15, 0);
-  head.rotation.z = -0.18;
+  const shoulder = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.22, 0.16, 20), material);
+  shoulder.position.y = 1.24;
 
-  const nose = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.22, 0.3), material);
-  nose.position.set(0.32, 1.0, 0);
-  nose.rotation.z = -0.1;
+  const crownBand = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.14, 20), material);
+  crownBand.position.y = 1.4;
 
-  group.add(base, stem, head, nose);
-  group.position.y = 0.12;
+  const crossVertical = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.34, 0.09), material);
+  crossVertical.position.y = 1.65;
+  const crossHorizontal = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.09, 0.09), material);
+  crossHorizontal.position.y = 1.62;
+
+  group.add(base, body, shoulder, crownBand, crossVertical, crossHorizontal);
   return group;
 }
 
@@ -77,7 +83,7 @@ export function initHeroScene(container) {
     100
   );
   camera.position.set(3.4, 3.6, 6.4);
-  camera.lookAt(0, 0.3, 0);
+  camera.lookAt(0, 0.5, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -93,30 +99,46 @@ export function initHeroScene(container) {
   scene.add(rim);
 
   const board = buildBoard();
-  const knight = buildKnight();
-  knight.position.set(0.5, 0, 0.5);
-  scene.add(board, knight);
+
+  // Two kings facing each other across the board — red and black. The rig's
+  // initial rotation (below) is chosen so the red king faces the camera
+  // first when the page opens; scrolling slowly turns the whole board so
+  // the black king comes into view too.
+  const redKing = buildKing(RED);
+  redKing.position.set(0, 0.1, 1.6);
+  redKing.rotation.y = 0; // faces outward, toward the camera/viewer
+
+  const blackKing = buildKing(BLACK);
+  blackKing.position.set(0, 0.1, -1.6);
+  blackKing.rotation.y = Math.PI; // rotated to face the red king across the board
 
   const rig = new THREE.Group();
-  rig.add(board, knight);
-  scene.remove(board, knight);
-  scene.add(rig);
+  rig.add(board, redKing, blackKing);
   rig.rotation.x = -0.15;
+  // Opening orientation: red king toward the viewer.
+  rig.rotation.y = 0.05;
+  scene.add(rig);
 
   let raf = null;
-  let targetRotation = 0;
-  let currentRotation = 0;
+  let targetRotation = rig.rotation.y;
+  let currentRotation = rig.rotation.y;
 
   function onScroll() {
-    const progress = Math.min(window.scrollY / (window.innerHeight * 1.2), 1);
-    targetRotation = progress * Math.PI * 0.6;
+    // Ties the board's rotation to progress through the *entire* page (not
+    // just the hero), so the piece keeps slowly turning as you scroll all
+    // the way down, rather than settling after the first screen.
+    const scrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    const progress = Math.min(window.scrollY / scrollable, 1);
+    targetRotation = 0.05 + progress * Math.PI * 1.85;
   }
 
   function animate() {
     currentRotation += (targetRotation - currentRotation) * 0.06;
-    rig.rotation.y = currentRotation + 0.15;
+    rig.rotation.y = currentRotation;
     if (!reducedMotion) {
-      knight.position.y = 0.05 + Math.sin(performance.now() * 0.0012) * 0.03;
+      const bob = Math.sin(performance.now() * 0.0011) * 0.025;
+      redKing.position.y = 0.1 + bob;
+      blackKing.position.y = 0.1 - bob;
     }
     renderer.render(scene, camera);
     raf = requestAnimationFrame(animate);

@@ -2,12 +2,19 @@ import {
   profile, summary, skills, experience, projects, labs,
   certifications, certificates, education, publications,
 } from '../data/cv.js';
-import { openModal } from './modal.js';
 
 function el(html) {
   const t = document.createElement('template');
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
+}
+
+// Stagger each element's scroll-reveal by a few ms per item so a grid/list
+// animates in as a cascade instead of all at once — used throughout the
+// page (cards, list rows, skill groups) so the animation isn't confined to
+// just the section headings.
+function staggerDelay(index, stepMs = 70, maxMs = 420) {
+  return `style="transition-delay:${Math.min(index * stepMs, maxMs)}ms"`;
 }
 
 /* ---------------------------- HERO ---------------------------- */
@@ -43,10 +50,10 @@ function renderSummary() {
 /* ---------------------------- SKILLS ---------------------------- */
 function renderSkills() {
   const section = document.getElementById('skills');
-  const groups = skills.map((g) => `
-    <div class="skill-group">
+  const groups = skills.map((g, i) => `
+    <div class="skill-group reveal" ${staggerDelay(i)}>
       <h3>${g.category}</h3>
-      <ul>${g.items.map((i) => `<li>${i}</li>`).join('')}</ul>
+      <ul>${g.items.map((item) => `<li>${item}</li>`).join('')}</ul>
     </div>
   `).join('');
 
@@ -64,6 +71,7 @@ function renderExperience() {
   const section = document.getElementById('experience');
   const cards = experience.map((e, i) => makeFlipCard({
     id: `exp-${i}`,
+    index: i,
     title: e.title,
     meta: `${e.type} · ${e.period}`,
     summaryText: e.points[0] || '',
@@ -88,6 +96,7 @@ function renderProjects() {
   const section = document.getElementById('projects');
   const cards = projects.map((p, i) => makeFlipCard({
     id: `proj-${i}`,
+    index: i,
     title: p.title,
     meta: p.period,
     summaryText: p.summary,
@@ -99,11 +108,11 @@ function renderProjects() {
     <div class="reveal">
       <span class="section__eyebrow">Builds</span>
       <h2 class="section__heading" id="projects-heading">Projects</h2>
-      <p class="section__intro">Flip a card for implementation details, or open the full write-up in a dialog.</p>
+      <p class="section__intro">Click or press Enter on a card to flip it and see the details.</p>
       <div class="deck-grid">${cards}</div>
     </div>
   `));
-  wireFlipCards(section, { modal: true, data: projects });
+  wireFlipCards(section);
 }
 
 /* ---------------------------- LABS / CTFs ---------------------------- */
@@ -112,11 +121,13 @@ function renderLabs() {
   if (!labs.length) return;
   const cards = labs.map((l, i) => makeFlipCard({
     id: `lab-${i}`,
+    index: i,
     title: l.title,
     meta: l.period,
     summaryText: l.points[0] || '',
     points: l.points,
     tags: [],
+    extraLink: l.certificateUrl ? { label: 'View Certificate', url: l.certificateUrl } : null,
   })).join('');
 
   section.appendChild(el(`
@@ -135,11 +146,13 @@ function renderCertifications() {
   if (!certifications.length) return;
   const cards = certifications.map((c, i) => makeFlipCard({
     id: `cert-${i}`,
+    index: i,
     title: c.title,
     meta: c.period,
     summaryText: c.points[0] || '',
     points: c.points,
     tags: [],
+    extraLink: c.certificateUrl ? { label: 'View Certificate', url: c.certificateUrl } : null,
   })).join('');
 
   section.appendChild(el(`
@@ -152,34 +165,38 @@ function renderCertifications() {
   wireFlipCards(section);
 }
 
-/* ---------------------------- CERTIFICATES (list) ---------------------------- */
+/* ---------------------------- CERTIFICATES ---------------------------- */
+// Same card treatment as Certifications above (flip card + a verification
+// link on the back), just a shorter/simpler entry shape.
 function renderCertificates() {
   const section = document.getElementById('certificates');
   if (!certificates.length) return;
-  const rows = certificates.map((c) => `
-    <div class="list-card">
-      <div>
-        <div class="list-card__title">${c.title}</div>
-        <div class="list-card__issuer">${c.issuer}</div>
-      </div>
-      <span class="list-card__period">${c.period}</span>
-    </div>
-  `).join('');
+  const cards = certificates.map((c, i) => makeFlipCard({
+    id: `certificate-${i}`,
+    index: i,
+    title: c.title,
+    meta: `${c.issuer} · ${c.period}`,
+    summaryText: c.issuer,
+    points: [`Issued by ${c.issuer}`, c.period],
+    tags: [],
+    extraLink: c.certificateUrl ? { label: 'View Certificate', url: c.certificateUrl } : null,
+  })).join('');
 
   section.appendChild(el(`
     <div class="reveal">
       <span class="section__eyebrow">Additional Learning</span>
       <h2 class="section__heading" id="certificates-heading">Certificates</h2>
-      <div>${rows}</div>
+      <div class="deck-grid">${cards}</div>
     </div>
   `));
+  wireFlipCards(section);
 }
 
 /* ---------------------------- EDUCATION ---------------------------- */
 function renderEducation() {
   const section = document.getElementById('education');
-  const rows = education.map((e) => `
-    <div class="list-card">
+  const rows = education.map((e, i) => `
+    <div class="list-card reveal" ${staggerDelay(i)}>
       <div>
         <div class="list-card__title">${e.school} — ${e.degree}</div>
         <div class="list-card__issuer">${e.location} · ${e.metric}</div>
@@ -207,8 +224,8 @@ function renderPublicationsNavIfNeeded() {
   const section = document.getElementById('education');
   const pubSection = el(`<section id="publications" class="section" aria-labelledby="publications-heading"></section>`);
   section.after(pubSection);
-  const rows = publications.map((p) => `
-    <div class="list-card">
+  const rows = publications.map((p, i) => `
+    <div class="list-card reveal" ${staggerDelay(i)}>
       <div>
         <div class="list-card__title">${p.title}</div>
         <div class="list-card__issuer">${p.venue || ''}</div>
@@ -238,7 +255,7 @@ function renderContact() {
       </p>
 
       <div class="contact-layout">
-        <form id="contact-form" class="contact-form" novalidate>
+        <form id="contact-form" class="contact-form reveal" novalidate>
           <div class="contact-form__row">
             <label for="contact-name">Name</label>
             <input id="contact-name" name="name" type="text" autocomplete="name" required />
@@ -257,7 +274,8 @@ function renderContact() {
           </div>
         </form>
 
-        <div class="contact-links">
+        <div class="contact-side reveal" style="transition-delay:120ms">
+          <img class="contact-photo" src="${profile.photo}" alt="${profile.name}" width="400" height="400" loading="lazy" />
           <a class="contact-link" href="${profile.links.github}" target="_blank" rel="noopener noreferrer">
             <span class="contact-item__label">GitHub</span>
             <span class="contact-item__value">${profile.links.github.replace('https://', '')}</span>
@@ -273,9 +291,11 @@ function renderContact() {
 }
 
 /* ---------------------------- Card factory + flip wiring ---------------------------- */
-function makeFlipCard({ id, title, meta, summaryText, points, tags, extraLink }) {
+// Flip-to-view is the only detail interaction (no separate "more detail"
+// popup) — the back face always shows the full points list.
+function makeFlipCard({ id, index = 0, title, meta, summaryText, points, tags, extraLink }) {
   return `
-    <div class="card3d reveal" id="${id}" tabindex="0" role="button"
+    <div class="card3d reveal" ${staggerDelay(index)} id="${id}" tabindex="0" role="button"
          aria-pressed="false" aria-label="${title}, press Enter to flip for details">
       <div class="card3d__inner">
         <div class="card3d__face card3d__face--front">
@@ -283,31 +303,24 @@ function makeFlipCard({ id, title, meta, summaryText, points, tags, extraLink })
           <h3 class="card3d__title">${title}</h3>
           <p class="card3d__summary">${summaryText}</p>
           ${tags.length ? `<div class="card3d__tags">${tags.map((t) => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
-          <span class="card3d__flip-hint">&#9821; Flip for details</span>
+          <span class="card3d__flip-hint">&#9812; Flip for details</span>
         </div>
         <div class="card3d__face card3d__face--back">
           <span class="card3d__meta">${meta}</span>
           <h3 class="card3d__title">${title}</h3>
           <ul class="card3d__back-list">${points.map((p) => `<li>${p}</li>`).join('')}</ul>
           ${extraLink ? `<a class="btn btn--ghost btn--small" href="${extraLink.url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${extraLink.label}</a>` : ''}
-          ${points.length > 2 ? `<button class="btn btn--ghost btn--small card3d__more" type="button">More detail</button>` : ''}
         </div>
       </div>
     </div>
   `;
 }
 
-function wireFlipCards(container, options = {}) {
-  container.querySelectorAll('.card3d').forEach((card, i) => {
+function wireFlipCards(container) {
+  container.querySelectorAll('.card3d').forEach((card) => {
     const flip = (e) => {
-      // Let links/buttons on the back face work without triggering a flip-back.
-      if (e.target.closest('a, button')) {
-        if (e.target.classList.contains('card3d__more') && options.modal) {
-          const p = options.data[i];
-          openModal({ title: p.title, meta: p.period, points: p.points, tags: p.tags });
-        }
-        return;
-      }
+      // Let links on the back face work without also triggering a flip-back.
+      if (e.target.closest('a')) return;
       const flipped = card.classList.toggle('is-flipped');
       card.setAttribute('aria-pressed', String(flipped));
     };
