@@ -22,7 +22,7 @@ export const profile = {
   resumeFile: './Kislay_Anand_Resume.pdf',
   // TODO: replace with a real photo (square, at least 400x400px works best).
   // Drop the file in at the repo root and update this path — e.g. './photo.jpg'.
-  photo: './photo.jpg',
+  photo: './photo.png',
   contact: {
     // TODO: create a free form at https://formspree.io (or any compatible
     // service — Getform, Web3Forms, etc.), point it at your inbox from
