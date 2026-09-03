@@ -20,15 +20,15 @@ export const profile = {
   },
   resumeFile: './Kislay_Anand_Resume.pdf',
   contact: {
-    // Where messages from the site's contact form arrive. Not displayed
-    // anywhere on the page — only used as the mailto fallback target and,
-    // once configured, as the account behind formEndpoint below.
-    destinationEmail: 'helltohacking@gmail.com',
-    // TODO: create a free form at https://formspree.io (verify it with the
-    // destinationEmail above) and paste its endpoint here, e.g.
-    // 'https://formspree.io/f/abcdwxyz'. Until this is set, the form falls
-    // back to opening the visitor's own email client via a mailto: link —
-    // see README §3 "Contact form" for full setup steps.
+    // TODO: create a free form at https://formspree.io (or any compatible
+    // service — Getform, Web3Forms, etc.), point it at your inbox from
+    // within that service's own dashboard, and paste the resulting
+    // endpoint URL here, e.g. 'https://formspree.io/f/abcdwxyz'.
+    //
+    // Deliberately, no email address lives anywhere in this codebase —
+    // the destination inbox is configured entirely on the form provider's
+    // side, so it's never visible in this public repo, the page source,
+    // or dev tools. See README "Contact form" for full setup steps.
     formEndpoint: '',
   },
 };

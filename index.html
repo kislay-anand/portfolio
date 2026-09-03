@@ -40,8 +40,21 @@
   }
   </script>
 
-  <script type="module" crossorigin src="./src/main.js"></script>
+  <!--
+    No build step: this maps the bare specifier "three" (used in
+    src/three/heroScene.js) to a CDN-hosted ES module, so the whole
+    site runs as plain, unbundled JavaScript straight from GitHub Pages.
+  -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"
+    }
+  }
+  </script>
+
   <link rel="stylesheet" href="./src/styles/main.css" />
+  <script type="module" src="./src/main.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>

@@ -1,22 +1,14 @@
 {
   "name": "kislay-anand-portfolio",
-  "version": "1.0.0",
-  "description": "Cybersecurity portfolio for Kislay Anand — chess-deck themed, 3D-animated, built with Vite + Three.js.",
+  "version": "2.0.0",
+  "description": "Cybersecurity portfolio for Kislay Anand — chess-deck themed, 3D-animated. Zero-build static site, deployable directly on GitHub Pages.",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "node scripts/smoke-test.mjs",
-    "lint:html": "echo 'No HTML linter configured — see README for manual QA checklist.'"
-  },
-  "dependencies": {
-    "three": "^0.169.0"
+    "dev": "npx --yes serve . -l 5173",
+    "test": "node scripts/smoke-test.mjs"
   },
   "devDependencies": {
-    "jsdom": "^30.0.1",
-    "vite": "^5.4.19",
-    "vite-plugin-compression2": "^1.3.3"
+    "jsdom": "^30.0.1"
   }
 }
